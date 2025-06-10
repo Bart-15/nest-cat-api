@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
@@ -34,7 +35,7 @@ export class CatsController {
   }
 
   @Post()
-  createCat(@Body() createCatDto: CreateCatDto) {
+  createCat(@Body(new ValidationPipe()) createCatDto: CreateCatDto) {
     const newCat = createCatDto;
     this.catsService.createCat(createCatDto);
 
