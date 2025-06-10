@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -23,7 +24,13 @@ export class CatsController {
 
   @Get(':id')
   getCat(@Param('id') id: string) {
-    return this.catsService.getCatById(id);
+    try {
+      return this.catsService.getCatById(id);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new NotFoundException('Oops! Cat not found');
+      }
+    }
   }
 
   @Post()
