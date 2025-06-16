@@ -1,8 +1,12 @@
-import { MinLength } from 'class-validator';
+import { IsString, IsInt, MinLength } from 'class-validator';
 
 export class CreateCatDto {
   @MinLength(3)
   name: string;
 
-  color: string;
+  @IsInt()
+  age: number;
+
+  @IsString()
+  breed: string;
 }

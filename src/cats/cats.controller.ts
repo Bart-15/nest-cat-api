@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -19,36 +18,27 @@ export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
   @Get()
-  getCats(@Query('color') color: string) {
-    return this.catsService.getCats(color);
+  getCats(@Query('breed') breed?: string) {
+    return this.catsService.findAll(breed);
   }
 
   @Get(':id')
-  getCat(@Param('id') id: string) {
-    try {
-      return this.catsService.getCatById(id);
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new NotFoundException('Oops! Cat not found');
-      }
-    }
+  getCat(@Param('id') id: number) {
+    return this.catsService.findOne(Number(id));
   }
 
   @Post()
   createCat(@Body(new ValidationPipe()) createCatDto: CreateCatDto) {
-    const newCat = createCatDto;
-    this.catsService.createCat(createCatDto);
-
-    return newCat;
+    return this.catsService.create(createCatDto);
   }
 
   @Put(':id')
   updateCat(@Param('id') id: string, @Body() updateCatDto: UpdateCatDto) {
-    return this.catsService.updateCat(id, updateCatDto);
+    return this.catsService.update(Number(id), updateCatDto);
   }
 
   @Delete(':id')
-  deleteCat(@Param('id') id: string) {
-    return this.catsService.deleteCat(id);
+  deleteCat(@Param('id') id: number) {
+    return this.catsService.remove(Number(id));
   }
 }

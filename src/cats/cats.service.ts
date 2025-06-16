@@ -1,68 +1,46 @@
-import { v4 as uuidv4 } from 'uuid';
-
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class CatsService {
-  private cats = [
-    {
-      id: uuidv4(),
-      name: 'Max',
-      color: 'black',
-    },
-    {
-      id: uuidv4(),
-      name: 'Pusong',
-      color: 'white',
-    },
-  ];
+  constructor(private prisma: PrismaService) {}
 
-  getCats(color?: string) {
-    if (color) {
-      return this.cats.filter((cat) => cat.color === color);
-    }
-
-    return this.cats;
+  create(data: CreateCatDto) {
+    return this.prisma.cat.create({ data });
   }
 
-  getCatById(id: string) {
-    const cat = this.cats.find((cat) => cat.id === id);
+  findAll(breed?: string) {
+    return this.prisma.cat.findMany({
+      where: breed
+        ? { breed: { equals: breed, mode: 'insensitive' } }
+        : undefined,
+    });
+  }
+
+  async findOne(id: number) {
+    const cat = await this.prisma.cat.findUnique({ where: { id } });
 
     if (!cat) {
-      throw new Error('Cat not found');
+      throw new NotFoundException('Cat not found');
     }
 
     return cat;
   }
 
-  createCat(createCatDto: CreateCatDto) {
-    const newCat = {
-      id: uuidv4(),
-      ...createCatDto,
-    };
+  async update(id: number, data: UpdateCatDto) {
+    await this.findOne(id);
 
-    this.cats.push(newCat);
-  }
-
-  updateCat(id: string, updateCatDto: UpdateCatDto) {
-    this.cats = this.cats.map((cat) => {
-      if (cat.id === id) {
-        return { ...cat, ...updateCatDto };
-      }
-
-      return cat;
+    return this.prisma.cat.update({
+      where: { id },
+      data,
     });
-
-    return this.getCatById(id);
   }
 
-  deleteCat(id: string) {
-    const toBeRemoved = this.getCatById(id);
+  async remove(id: number) {
+    await this.findOne(id);
 
-    this.cats = this.cats.filter((cat) => cat.id !== id);
-
-    return toBeRemoved;
+    return this.prisma.cat.delete({ where: { id } });
   }
 }
