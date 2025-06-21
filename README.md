@@ -105,7 +105,7 @@ GET http://localhost:3000/cats
 
 ---
 
-## 🧪 Testing (coming soon)
+## 🧪 How to Test
 
 ```bash
 # Run unit tests

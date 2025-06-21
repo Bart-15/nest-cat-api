@@ -1,73 +1,84 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
-import { NotFoundException } from '@nestjs/common';
-import { CreateCatDto } from './dto/create-cat.dto';
-import { UpdateCatDto } from './dto/update-cat.dto';
+
+const mockCat = { id: 1, name: 'Whiskers', breed: 'Siamese', age: 2 };
 
 describe('CatsController', () => {
-  let catsController: CatsController;
-  let catsService: CatsService;
+  let controller: CatsController;
+  let service: CatsService;
 
   const mockCatsService = {
-    getCats: jest.fn(),
-    getCatById: jest.fn(),
-    createCat: jest.fn(),
-    updateCat: jest.fn(),
-    deleteCat: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
   };
 
   beforeEach(async () => {
-    const moduleRef: TestingModule = await Test.createTestingModule({
+    const module: TestingModule = await Test.createTestingModule({
       controllers: [CatsController],
-      providers: [{ provide: CatsService, useValue: mockCatsService }],
+      providers: [
+        {
+          provide: CatsService,
+          useValue: mockCatsService,
+        },
+      ],
     }).compile();
 
-    catsController = moduleRef.get<CatsController>(CatsController);
-    catsService = moduleRef.get<CatsService>(CatsService);
+    controller = module.get<CatsController>(CatsController);
+    service = module.get<CatsService>(CatsService);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should return all cats', () => {
-    const result = [{ id: 1, name: 'Max', color: 'black' }];
-    mockCatsService.getCats.mockReturnValue(result);
-
-    expect(catsController.getCats('white')).toBe(result);
-    expect(mockCatsService.getCats).toHaveBeenCalledWith('white');
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
   });
 
-  it('it should return cat by ID', () => {
-    const result = { id: 1, name: 'Max', color: 'black' };
-    mockCatsService.getCatById.mockReturnValue(result);
+  it('should get all cats', async () => {
+    mockCatsService.findAll.mockResolvedValue([mockCat]);
 
-    expect(catsController.getCat('1')).toBe(result);
+    const result = await controller.getCats();
+    expect(result).toEqual([mockCat]);
+    expect(mockCatsService.findAll).toHaveBeenCalled();
   });
 
-  it('should throw an NotFoundException if cat not found', () => {
-    mockCatsService.getCatById.mockImplementation(() => {
-      throw new Error('Not found');
+  it('should get one cat with type breed Siamese', async () => {
+    mockCatsService.findAll.mockResolvedValue([mockCat]);
+
+    const result = await controller.getCats('Siamese');
+    expect(result).toEqual([mockCat]);
+    expect(mockCatsService.findAll).toHaveBeenCalledWith('Siamese');
+  });
+
+  it('should get on cat by id', async () => {
+    mockCatsService.findOne.mockResolvedValue(mockCat);
+
+    const result = await controller.getCat(1);
+    expect(result).toEqual(mockCat);
+    expect(mockCatsService.findOne).toHaveBeenCalledWith(1);
+  });
+
+  it('should remove cat by id', async () => {
+    mockCatsService.remove.mockResolvedValue(mockCat);
+
+    const result = await controller.deleteCat(1);
+    expect(result).toEqual(mockCat);
+    expect(mockCatsService.remove).toHaveBeenCalledWith(1);
+  });
+
+  it('should update cat by id', async () => {
+    const updatedCat = { ...mockCat, name: 'Ampon Alarcon' };
+    mockCatsService.update.mockResolvedValue(updatedCat);
+
+    const result = await controller.updateCat('1', { name: 'Max Ampon' });
+    expect(result).toEqual(updatedCat);
+    expect(mockCatsService.update).toHaveBeenCalledWith(1, {
+      name: 'Max Ampon',
     });
-
-    expect(() => catsController.getCat('999')).toThrow(NotFoundException);
-  });
-
-  it('should create a cat', () => {
-    const createDto: CreateCatDto = { name: 'Tiger', color: 'orange' };
-    expect(catsController.createCat(createDto)).toEqual(createDto);
-    expect(mockCatsService.createCat).toHaveBeenCalledWith(createDto);
-  });
-
-  it('should update a cat', () => {
-    const updateDto: UpdateCatDto = { name: 'Leo' };
-    catsController.updateCat('1', updateDto);
-    expect(mockCatsService.updateCat).toHaveBeenCalledWith('1', updateDto);
-  });
-
-  it('should delete a cat', () => {
-    catsController.deleteCat('1');
-    expect(mockCatsService.deleteCat).toHaveBeenCalledWith('1');
   });
 });
