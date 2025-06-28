@@ -27,21 +27,25 @@ export class CatsController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
   getCat(@Param('id') id: number) {
     return this.catsService.findOne(Number(id));
   }
 
   @Post()
+  @UseGuards(AuthGuard('jwt'))
   createCat(@Body(new ValidationPipe()) createCatDto: CreateCatDto) {
     return this.catsService.create(createCatDto);
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
   updateCat(@Param('id') id: string, @Body() updateCatDto: UpdateCatDto) {
     return this.catsService.update(Number(id), updateCatDto);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   deleteCat(@Param('id') id: number) {
     return this.catsService.remove(Number(id));
   }
