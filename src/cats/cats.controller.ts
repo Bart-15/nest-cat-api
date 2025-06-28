@@ -8,16 +8,20 @@ import {
   Put,
   Query,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
 import { CatsService } from './cats.service';
+
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('cats')
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
   getCats(@Query('breed') breed?: string) {
     return this.catsService.findAll(breed);
   }
