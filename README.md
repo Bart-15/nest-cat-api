@@ -1,7 +1,8 @@
-# 🐱 NestJS Cats API
+# 🐱 NestJS Cats API + AWS Cognito Authentication
 
-A simple RESTful API built with [NestJS](https://nestjs.com/), [Prisma](https://www.prisma.io/), and PostgreSQL (via Docker).  
-Performs basic CRUD operations on a Cat resource.
+A secure and simple RESTful API built with [NestJS](https://nestjs.com/), [Prisma](https://www.prisma.io/), [PostgreSQL](https://www.postgresql.org/) via Docker, and [AWS Cognito](https://aws.amazon.com/cognito/) for user authentication.
+
+Performs basic CRUD operations on a `Cat` resource and supports user sign-up and sign-in through AWS Cognito.
 
 ---
 
@@ -10,6 +11,7 @@ Performs basic CRUD operations on a Cat resource.
 - [NestJS](https://nestjs.com/)
 - [Prisma ORM](https://www.prisma.io/)
 - [PostgreSQL](https://www.postgresql.org/) (via Docker)
+- [AWS Cognito](https://aws.amazon.com/cognito/) (authentication)
 - TypeScript
 
 ---
@@ -59,6 +61,8 @@ docker-compose up -d
 
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/cats_db?schema=public"
+COGNITO_USER_POOL_ID=your_user_pool_id
+COGNITO_CLIENT_ID=your_app_client_id
 ```
 
 ---
@@ -110,20 +114,4 @@ GET http://localhost:3000/cats
 ```bash
 # Run unit tests
 npm run test
-```
-
----
-
-## 📁 Project Structure
-
-```
-src/
-├── cats/
-│   ├── cats.controller.ts
-│   ├── cats.service.ts
-│   ├── cats.module.ts
-├── prisma/
-│   └── schema.prisma
-├── app.module.ts
-└── main.ts
 ```
